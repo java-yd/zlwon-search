@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zlwon.mapper.ApplicationCaseMapper" >
+    <!-- 得到所有案例-->
+    <select id="selectAllApplicationCase" resultType="com.zlwon.pojo.es.ApplicationCaseES" >
+        SELECT  app.id,app.sid,app.title,par.name appProduct,app.industry_id industryId,app.market_id  marketId,
+		app.select_requirements selectRequirements,app.select_cause selectCause,app.setting,app.photo,app.create_time createTime
+		FROM    zl_application_case   app
+		LEFT   JOIN   zl_specification_parameter  par   ON  par.id = app.app_product_id   AND   par.class_type = 9
+		WHERE  app.del = 1 AND  app.examine = 1
+    </select>
+</mapper>
