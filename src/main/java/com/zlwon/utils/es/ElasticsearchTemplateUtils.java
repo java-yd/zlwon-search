@@ -4,12 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.GetQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 
 public class ElasticsearchTemplateUtils {
 	
 	
-	
+	/**
+	 * 根据文档id，得到文档信息
+	 * @param id
+	 * @param clazz
+	 * @param elasticsearchTemplat
+	 * @return
+	 */
+	public static <T> T queryOneSpecificationById(String   id,Class<T>  clazz,ElasticsearchTemplate  elasticsearchTemplat) {
+		GetQuery query = new GetQuery();
+		query.setId(id);
+		return   elasticsearchTemplat.queryForObject(query , clazz);
+	}
 	
 	/**
 	 * 添加(更新)文档，批量添加(更新)，

@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.ResultsExtractor;
+import org.springframework.data.elasticsearch.core.query.GetQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
@@ -60,7 +61,15 @@ public class SpecificationServiceImpl implements SpecificationService {
 	}
 	
 	/**
-	 * 物性搜索
+	 * 根据id搜索物性文档信息
+	 * @return
+	 */
+	public SpecificationES findOneSpecificationById(String   id) {
+		return  ElasticsearchTemplateUtils.queryOneSpecificationById(id,SpecificationES.class,elasticsearchTemplate);
+	}
+	
+	/**
+	 * 物性搜索-分页获取
 	 * @return
 	 */
 	public Object findSpecification(Integer pageIndex, Integer pageSize, SpecificationDTO specificationDTO) {

@@ -123,6 +123,14 @@ public class ElasticsearchTemplateUtilsTest {
 		System.out.println(object);
 	}
 	
+	/**
+	 * 根据文档id，得到文档信息
+	 */
+	@Test
+	public  void   testQueryOneSpecificationById(){
+		SpecificationES specificationES = ElasticsearchTemplateUtils.queryOneSpecificationById(4078+"", SpecificationES.class, elasticsearchTemplate);
+		System.out.println(specificationES);
+	}
 	
 	/**
 	 * 如果有路径，不指定路由，还是删不掉，但是不报错

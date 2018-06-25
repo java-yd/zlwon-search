@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zlwon.pojo.es.dto.ApplicationCaseDTO;
 import com.zlwon.pojo.es.dto.SpecificationDTO;
 import com.zlwon.service.ApplicationCaseService;
 import com.zlwon.service.SpecificationService;
@@ -42,8 +43,9 @@ public class SearchController {
 	 * @return
 	 */
 	@RequestMapping(value="queryApplicationCase",method=RequestMethod.GET)
-	public   Object   queryApplicationCase(){
-//		Object object = applicationCaseService.findApplicationCase();
-		return   null;
+	public   Object   queryApplicationCase(@RequestParam(defaultValue="1")Integer  pageIndex,
+			@RequestParam(defaultValue="10")Integer  pageSize,ApplicationCaseDTO applicationCaseDTO){
+		Object object = applicationCaseService.findApplicationCase(pageIndex,pageSize,applicationCaseDTO);
+		return   object;
 	}
 }

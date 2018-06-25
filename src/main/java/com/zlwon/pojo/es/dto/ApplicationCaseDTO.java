@@ -1,5 +1,8 @@
 package com.zlwon.pojo.es.dto;
 
+import lombok.Data;
+
+@Data
 public class ApplicationCaseDTO {
 
 	private  Integer   mids;//生产商id
