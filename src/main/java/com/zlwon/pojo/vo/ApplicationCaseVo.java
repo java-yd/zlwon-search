@@ -1,4 +1,4 @@
-package com.zlwon.pojo.es.vo;
+package com.zlwon.pojo.vo;
 
 import lombok.Data;
 

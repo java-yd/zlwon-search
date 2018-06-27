@@ -29,11 +29,11 @@ import org.springframework.stereotype.Service;
 
 import com.zlwon.mapper.ApplicationCaseMapper;
 import com.zlwon.pojo.constant.EsConstant;
+import com.zlwon.pojo.dto.ApplicationCaseDTO;
 import com.zlwon.pojo.es.ApplicationCaseES;
 import com.zlwon.pojo.es.SpecificationES;
 import com.zlwon.pojo.es.document.ApplicationCaseDocument;
-import com.zlwon.pojo.es.dto.ApplicationCaseDTO;
-import com.zlwon.pojo.es.vo.ApplicationCaseVo;
+import com.zlwon.pojo.vo.ApplicationCaseVo;
 import com.zlwon.service.ApplicationCaseService;
 import com.zlwon.service.SpecificationService;
 import com.zlwon.utils.JsonUtils;
@@ -87,10 +87,12 @@ public class ApplicationCaseServiceImpl implements ApplicationCaseService {
 			boolQuery
 				.should(QueryBuilders.multiMatchQuery(searchText, "title","appProduct","selectRequirements","selectCause","setting"))
 				.should(
-						new HasParentQueryBuilder("specificationES",QueryBuilders.multiMatchQuery(searchText,"name","content"), false)
+						new HasParentQueryBuilder("specificationES",QueryBuilders.multiMatchQuery(searchText,"name","content"), false) //false好像是不参与评分
 							.innerHit(new InnerHitBuilder().setHighlightBuilder(new HighlightBuilder().field("name"))));//查询结果显示父数据，并设置父数据中name为高亮显示
 		}else{
-			boolQuery.must(new HasParentQueryBuilder("specificationES",QueryBuilders.matchAllQuery(),false).innerHit(new InnerHitBuilder()));
+			boolQuery
+				.should(QueryBuilders.matchQuery("emptyField", EsConstant.APPLICATIONCASEES_EMPTYFIELD_VALUE))//should是必须要满足一个，所以在ApplicationCaseES设置了一个匹配字符串,否则会造成数据丢失
+				.should(new HasParentQueryBuilder("specificationES",QueryBuilders.matchAllQuery(),false).innerHit(new InnerHitBuilder()));
 		}
 		
 		SearchQuery query = new  NativeSearchQueryBuilder()
@@ -152,7 +154,7 @@ public class ApplicationCaseServiceImpl implements ApplicationCaseService {
 				for (Entry<String, SearchHitField> searchHitField : fields.entrySet()) {
 					Object parentId= searchHitField.getValue().getValues().get(0);
 					SpecificationES specificationES = specificationService.findOneSpecificationById(parentId+"");
-					vo.setName(specificationES.getName());
+					vo.setName(specificationES == null ? "" : specificationES.getName());
 					break;
 				}
 				break;
@@ -200,6 +202,7 @@ public class ApplicationCaseServiceImpl implements ApplicationCaseService {
 	private String getApplicationCaseSource(ApplicationCaseES applicationCaseES) {
 		ApplicationCaseDocument  document = new  ApplicationCaseDocument();
 		BeanUtils.copyProperties(applicationCaseES, document);
+		applicationCaseES.setEmptyField(EsConstant.APPLICATIONCASEES_EMPTYFIELD_VALUE);
 		return JsonUtils.objectToJson(document);
 	}
 }

@@ -1,4 +1,4 @@
-package com.zlwon.pojo.es.dto;
+package com.zlwon.pojo.dto;
 
 import lombok.Data;
 

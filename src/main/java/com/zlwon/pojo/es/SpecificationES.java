@@ -28,6 +28,9 @@ public class SpecificationES implements Serializable{
 	@Field(type=FieldType.Text,analyzer="ik_max_word",searchAnalyzer="ik_max_word")
 	private  String   name;//物性规格名称，页面显示
 	
+	@Field(type=FieldType.Text)
+	private  String   emptyField;//匹配字符串，查询列表时(因为涉及到子文档查询，使用的should(查询条件必须满足一个)，否则会造成只有有案例的物性才会显示)，只用于无条件查询时匹配
+	
 	@Field(type=FieldType.Text,index=false)
 	private  String   brandName;//商标名，页面显示
 	

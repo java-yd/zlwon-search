@@ -11,6 +11,8 @@ import lombok.Data;
 public class ApplicationCaseDocument {
 	private String title;  //案例名称
 	
+	private  String   emptyField;//匹配字符串，查询列表时(因为涉及到父(子)文档查询，使用的should(查询条件必须满足一个)，否则会造成案例数据缺失)
+	
 	private String appProduct;  //应用产品名称
 	
 	private Integer industryId;  //应用行业ID

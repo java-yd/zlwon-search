@@ -26,6 +26,9 @@ public class ApplicationCaseES {
 	@Field(type=FieldType.Text,analyzer="ik_max_word",searchAnalyzer="ik_max_word")
 	private String title;  //案例名称
 	
+	@Field(type=FieldType.Text)
+	private  String   emptyField;//匹配字符串，查询列表时(因为涉及到父(子)文档查询，使用的should(查询条件必须满足一个)，否则会造成案例数据缺失)，只用于无条件查询时匹配
+	
 	@Field(type=FieldType.Text,analyzer="ik_max_word",searchAnalyzer="ik_max_word")
 	private String appProduct;  //应用产品名称
 	

@@ -9,6 +9,8 @@ public class SpecificationDocument {
 
 	private  String   name;//物性规格名称，页面显示
 	
+	private  String   emptyField;//匹配字符串，查询列表时，要不然不是都显示
+	
 	private  String   brandName;//商标名，页面显示
 	
 	private  String   brandId;//商标id

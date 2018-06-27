@@ -7,13 +7,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.lucene.queryparser.flexible.core.nodes.DeletedQueryNode;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.reindex.DeleteByQueryAction;
 import org.elasticsearch.join.query.HasChildQueryBuilder;
-import org.elasticsearch.script.Script;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder.Field;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
@@ -33,8 +30,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.zlwon.pojo.constant.EsConstant;
 import com.zlwon.pojo.es.ApplicationCaseES;
 import com.zlwon.pojo.es.SpecificationES;
+import com.zlwon.pojo.es.document.ApplicationCaseDocument;
 import com.zlwon.pojo.es.document.SpecificationDocument;
-import com.zlwon.pojo.es.vo.SpecificationVo;
+import com.zlwon.pojo.vo.SpecificationVo;
 import com.zlwon.utils.JsonUtils;
 
 @RunWith(SpringRunner.class)
@@ -62,14 +60,25 @@ public class ElasticsearchTemplateUtilsTest {
 		ElasticsearchTemplateUtils.createIndexOrMapping(indexClass, mappingClass, elasticsearchTemplate);
 	}
 
-	//物性添加文档
+	//物性添加文档（测试单个）
 	@Test
 	public void  testAddSpecificationDocument(){
 		IndexQuery indexQuery = new IndexQuery();
 		indexQuery.setIndexName(EsConstant.ES_INDEXNAME);
 		indexQuery.setType("specificationES");
-		indexQuery.setId("2");
+		indexQuery.setId("166544");
 		indexQuery.setSource(getSource());
+		ElasticsearchTemplateUtils.addOneDocument(elasticsearchTemplate, indexQuery);
+	}
+	//案例添加文档（测试单个）
+	@Test
+	public void  testAddApplicationCaseDocument(){
+		IndexQuery indexQuery = new IndexQuery();
+		indexQuery.setIndexName(EsConstant.ES_INDEXNAME);
+		indexQuery.setType("applicationCaseES");
+		indexQuery.setId("888888");
+		indexQuery.setParentId("1665499");
+		indexQuery.setSource(getApplicationCaseSource());
 		ElasticsearchTemplateUtils.addOneDocument(elasticsearchTemplate, indexQuery);
 	}
 	
@@ -161,4 +170,11 @@ public class ElasticsearchTemplateUtilsTest {
 		return  JsonUtils.objectToJson(specificationES);
 	}
 	
+	private  String   getApplicationCaseSource(){
+		ApplicationCaseDocument  applicationCase = new  ApplicationCaseDocument();
+		applicationCase.setAppProduct("测试");
+		applicationCase.setTitle("哈哈");
+		applicationCase.setEmptyField(EsConstant.APPLICATIONCASEES_EMPTYFIELD_VALUE);
+		return  JsonUtils.objectToJson(applicationCase);
+	}
 }

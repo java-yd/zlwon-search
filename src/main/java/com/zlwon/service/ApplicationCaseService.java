@@ -1,6 +1,6 @@
 package com.zlwon.service;
 
-import com.zlwon.pojo.es.dto.ApplicationCaseDTO;
+import com.zlwon.pojo.dto.ApplicationCaseDTO;
 
 public interface ApplicationCaseService {
 

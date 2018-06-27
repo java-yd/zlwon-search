@@ -1,18 +1,14 @@
 package com.zlwon.controller;
 
-import org.elasticsearch.action.delete.DeleteRequestBuilder;
-import org.elasticsearch.action.support.replication.ReplicationRequestBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.zlwon.pojo.es.dto.ApplicationCaseDTO;
-import com.zlwon.pojo.es.dto.SpecificationDTO;
+import com.zlwon.pojo.dto.ApplicationCaseDTO;
+import com.zlwon.pojo.dto.SpecificationDTO;
 import com.zlwon.service.ApplicationCaseService;
 import com.zlwon.service.SpecificationService;
 

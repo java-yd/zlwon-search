@@ -3,39 +3,35 @@ package com.zlwon.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.queryparser.surround.query.FieldsQuery;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.InnerHitBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.join.query.HasChildQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder.Field;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.ResultsExtractor;
-import org.springframework.data.elasticsearch.core.query.GetQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
-import com.sun.tools.doclets.internal.toolkit.builders.FieldBuilder;
 import com.zlwon.mapper.SpecificationMapper;
 import com.zlwon.pojo.constant.EsConstant;
+import com.zlwon.pojo.dto.SpecificationDTO;
 import com.zlwon.pojo.es.SpecificationES;
 import com.zlwon.pojo.es.document.SpecificationDocument;
-import com.zlwon.pojo.es.dto.SpecificationDTO;
-import com.zlwon.pojo.es.vo.SpecificationVo;
+import com.zlwon.pojo.vo.SpecificationVo;
 import com.zlwon.service.SpecificationService;
 import com.zlwon.utils.JsonUtils;
 import com.zlwon.utils.ResultPage;
@@ -103,9 +99,14 @@ public class SpecificationServiceImpl implements SpecificationService {
 		String searchText = specificationDTO.getSearchText();//关键字
 		if(StringUtils.isNotBlank(searchText)){
 			boolQuery
-				.should(QueryBuilders.multiMatchQuery(searchText, "name","content"))
-				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.multiMatchQuery(searchText,"appProduct","title","selectRequirements","selectCause","setting"), ScoreMode.None));
+				.should(QueryBuilders.multiMatchQuery(searchText, "name","content").boost(2))//增加评分
+				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.multiMatchQuery(searchText,"appProduct","title","selectRequirements","selectCause","setting"), ScoreMode.Total).innerHit(new InnerHitBuilder()));
+		}else {
+			boolQuery
+				.should(QueryBuilders.matchQuery("emptyField", EsConstant.SPECIFICATIONES_EMPTYFIELD_VALUE))//should是必须要满足一个，所以在SpecificationES设置了一个匹配字符串,否则会造成数据丢失
+				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.matchAllQuery(), ScoreMode.Total).innerHit(new InnerHitBuilder()));
 		}
+		
 		
 		SearchQuery query = new  NativeSearchQueryBuilder()
 				.withIndices(EsConstant.ES_INDEXNAME)//指定查询的索引库
@@ -113,7 +114,7 @@ public class SpecificationServiceImpl implements SpecificationService {
 				.withQuery(boolQuery)
 				.withFilter(filterBuilder)
 				.withHighlightFields(new Field("name"),new  Field("content"))
-//				.withSort(SortBuilders.fieldSort("name").order(SortOrder.ASC))  //汉子无法排序
+//				.withSort(SortBuilders.fieldSort("sortName").order(SortOrder.ASC))  
 				.withPageable(new  PageRequest(pageIndex-1, pageSize))
 				.build();
 		return   query;
@@ -124,12 +125,24 @@ public class SpecificationServiceImpl implements SpecificationService {
 		Object object = elasticsearchTemplate.query(createSearchQuery(specificationDTO,pageIndex,pageSize), new ResultsExtractor(){
 			@Override
 			public Object extract(SearchResponse response) {
-				long totalNumber = response.getHits().totalHits;
-				SearchHit[] hits = response.getHits().getHits();
+				SearchHits searchHits = response.getHits();
+				long totalNumber = searchHits.totalHits;
+				SearchHit[] hits = searchHits.getHits();
+				
 				SpecificationVo  vo = null;
 				List<SpecificationVo>  list = new  ArrayList<>();
 				for (int i = 0; i < hits.length; i++) {
 					vo = new SpecificationVo();
+					
+					//关联案例个数
+					Map<String, SearchHits> innerHits = hits[i].getInnerHits();
+					if(innerHits != null && innerHits.size() > 0){
+						for (Entry<String, SearchHits> innerHit : innerHits.entrySet()) {
+							vo.setCaseCount(Integer.valueOf(innerHit.getValue().getTotalHits()+""));
+						}
+					}
+					
+					
 					String id = hits[i].getId();
 					vo.setId(Integer.valueOf(id));
 					Map<String, Object> source = hits[i].getSource();
@@ -170,7 +183,6 @@ public class SpecificationServiceImpl implements SpecificationService {
 			query.setSource(getSpecificatioSource(specificationES));
 			indexQuerys.add(query);
 		}
-		
 		return  indexQuerys;
 	}
 
@@ -178,6 +190,7 @@ public class SpecificationServiceImpl implements SpecificationService {
 	private String getSpecificatioSource(SpecificationES specificationES) {
 		SpecificationDocument  document = new  SpecificationDocument();
 		BeanUtils.copyProperties(specificationES, document);
+		document.setEmptyField(EsConstant.SPECIFICATIONES_EMPTYFIELD_VALUE);
 		return JsonUtils.objectToJson(document);
 	}
 

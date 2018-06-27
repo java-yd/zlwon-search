@@ -1,8 +1,7 @@
 package com.zlwon.service;
 
+import com.zlwon.pojo.dto.SpecificationDTO;
 import com.zlwon.pojo.es.SpecificationES;
-import com.zlwon.pojo.es.dto.SpecificationDTO;
-import com.zlwon.utils.es.ElasticsearchTemplateUtils;
 
 public interface SpecificationService {
 	
