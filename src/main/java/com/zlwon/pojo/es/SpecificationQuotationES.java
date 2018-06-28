@@ -25,6 +25,6 @@ public class SpecificationQuotationES {
 	@Parent(type="specificationES")
 	private  String    specificationId;//物性id
 	
-	@Field(type=FieldType.Text,index=false)
-	private  String    color;
+	@Field(type=FieldType.Text)
+	private  String   sid;//物性id，用来查询物性列表，统计报价单个数
 }

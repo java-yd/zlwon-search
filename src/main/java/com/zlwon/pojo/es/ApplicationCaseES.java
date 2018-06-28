@@ -21,7 +21,10 @@ public class ApplicationCaseES {
 	private Integer id;  //案例id，也是文档的id
 	
 	@Parent(type="specificationES")
-	private String sid;  //物性ID
+	private String specificationId;  //物性ID
+	
+	@Field(type=FieldType.Text)
+	private  String   sid;//物性id，用来查询物性列表，统计案例个数
 	
 	@Field(type=FieldType.Text,analyzer="ik_max_word",searchAnalyzer="ik_max_word")
 	private String title;  //案例名称

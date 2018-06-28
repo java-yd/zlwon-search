@@ -13,20 +13,17 @@ import com.zlwon.pojo.constant.EsConstant;
 import lombok.Data;
 
 /**
- * 物性问题文档
+ * 案例问题文档
  */
 @Data
-@Document(indexName=EsConstant.ES_INDEXNAME,type="specificationQuestionsES")
-public class SpecificationQuestionsES {
+@Document(indexName=EsConstant.ES_INDEXNAME,type="applicationCaseQuestionsES")
+public class ApplicationCaseQuestionsES {
 
 	@Id
-	private  Integer   id;//物性问题id，也是文档的id
+	private  Integer   id;//案例问题id，也是文档的id
 	
-	@Parent(type="specificationES")
-	private  String    specificationId;//物性id
-	
-	@Field(type=FieldType.Text)
-	private  String   sid;//物性id，用来查询物性列表，统计物性问题个数
+	@Parent(type="applicationCaseES")
+	private  String    applicationCaseId;//案例id
 	
 	@Field(type=FieldType.Text,index=false)
 	private  String    nickname;//提问用户昵称

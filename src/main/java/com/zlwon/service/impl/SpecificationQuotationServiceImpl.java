@@ -57,6 +57,7 @@ public class SpecificationQuotationServiceImpl implements SpecificationQuotation
 	private String getSpecificationQuotationSource(SpecificationQuotationES specificationQuotationES) {
 		SpecificationQuotationDocument  document = new SpecificationQuotationDocument();
 		BeanUtils.copyProperties(specificationQuotationES, document);
+		document.setSid(specificationQuotationES.getSpecificationId());
 		return JsonUtils.objectToJson(document);
 	}
 

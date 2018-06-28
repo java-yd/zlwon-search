@@ -57,6 +57,7 @@ public class SpecificationQuestionsServiceImpl implements SpecificationQuestions
 	private String getSpecificatioQuestionSource(SpecificationQuestionsES specificationQuestionsES) {
 		SpecificationQuestionsDocument  document = new  SpecificationQuestionsDocument();
 		BeanUtils.copyProperties(specificationQuestionsES, document);
+		document.setSid(specificationQuestionsES.getSpecificationId());
 		return JsonUtils.objectToJson(document);
 	}
 

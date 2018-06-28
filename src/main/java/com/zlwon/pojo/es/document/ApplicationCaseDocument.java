@@ -9,6 +9,9 @@ import lombok.Data;
 
 @Data
 public class ApplicationCaseDocument {
+	
+	private  String   sid;//物性id，用来查询物性列表，统计案例个数
+	
 	private String title;  //案例名称
 	
 	private  String   emptyField;//匹配字符串，查询列表时(因为涉及到父(子)文档查询，使用的should(查询条件必须满足一个)，否则会造成案例数据缺失)

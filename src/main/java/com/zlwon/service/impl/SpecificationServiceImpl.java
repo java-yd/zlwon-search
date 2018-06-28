@@ -21,8 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.ResultsExtractor;
-import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
-import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
@@ -31,7 +29,10 @@ import org.springframework.stereotype.Service;
 import com.zlwon.mapper.SpecificationMapper;
 import com.zlwon.pojo.constant.EsConstant;
 import com.zlwon.pojo.dto.SpecificationDTO;
+import com.zlwon.pojo.es.ApplicationCaseES;
 import com.zlwon.pojo.es.SpecificationES;
+import com.zlwon.pojo.es.SpecificationQuestionsES;
+import com.zlwon.pojo.es.SpecificationQuotationES;
 import com.zlwon.pojo.es.document.SpecificationDocument;
 import com.zlwon.pojo.vo.SpecificationVo;
 import com.zlwon.service.SpecificationService;
@@ -102,12 +103,12 @@ public class SpecificationServiceImpl implements SpecificationService {
 		if(StringUtils.isNotBlank(searchText)){
 			boolQuery
 				.should(QueryBuilders.multiMatchQuery(searchText, "name","content").boost(2))//增加评分
-				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.multiMatchQuery(searchText,"appProduct","title","selectRequirements","selectCause","setting"), ScoreMode.None).innerHit(new InnerHitBuilder()))
-				.should(new HasChildQueryBuilder("specificationQuestionsES", QueryBuilders.matchAllQuery(), ScoreMode.None).innerHit(new InnerHitBuilder()))
-				.should(new HasChildQueryBuilder("specificationQuotationES", QueryBuilders.matchAllQuery(), ScoreMode.None).innerHit(new InnerHitBuilder()));
+				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.multiMatchQuery(searchText,"appProduct","title","selectRequirements","selectCause","setting"), ScoreMode.None));//子个数是查询条件匹配的个数，不是总个数，坑
+//				.should(new HasChildQueryBuilder("specificationQuestionsES", QueryBuilders.boolQuery(), ScoreMode.None).innerHit(new InnerHitBuilder()))
+//				.should(new HasChildQueryBuilder("specificationQuotationES", QueryBuilders.disMaxQuery(), ScoreMode.None).innerHit(new InnerHitBuilder()))
 		}else {
 			boolQuery
-				.should(QueryBuilders.matchQuery("emptyField", EsConstant.SPECIFICATIONES_EMPTYFIELD_VALUE))//should是必须要满足一个，所以在SpecificationES设置了一个匹配字符串,否则会造成数据丢失
+				.should(QueryBuilders.matchPhraseQuery("emptyField", EsConstant.SPECIFICATIONES_EMPTYFIELD_VALUE))//should是必须要满足一个，所以在SpecificationES设置了一个匹配字符串,否则会造成数据丢失
 				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.matchAllQuery(), ScoreMode.Total).innerHit(new InnerHitBuilder()))
 				.should(new HasChildQueryBuilder("specificationQuestionsES", QueryBuilders.matchAllQuery(), ScoreMode.Total).innerHit(new InnerHitBuilder()))
 				.should(new HasChildQueryBuilder("specificationQuotationES", QueryBuilders.matchAllQuery(), ScoreMode.Total).innerHit(new InnerHitBuilder()));
@@ -139,20 +140,8 @@ public class SpecificationServiceImpl implements SpecificationService {
 				for (int i = 0; i < hits.length; i++) {
 					vo = new SpecificationVo();
 					
-					//关联案例（提问）个数
-					Map<String, SearchHits> innerHits = hits[i].getInnerHits();
-					if(innerHits != null && innerHits.size() > 0){
-						for (Entry<String, SearchHits> innerHit : innerHits.entrySet()) {
-							if(innerHit.getKey().equals("specificationQuestionsES")){
-								vo.setQuestionCount(Integer.valueOf(innerHit.getValue().getTotalHits()+""));
-							}else if (innerHit.getKey().equals("applicationCaseES")) {
-								vo.setCaseCount(Integer.valueOf(innerHit.getValue().getTotalHits()+""));
-							}else if (innerHit.getKey().equals("specificationQuotationES")) {
-								vo.setQuotationCount(Integer.valueOf(innerHit.getValue().getTotalHits()+""));
-							}
-						}
-					}
-					
+					//关联案例（提问，报价单）个数
+					guanlianInfo(hits[i],vo);
 					
 					String id = hits[i].getId();
 					vo.setId(Integer.valueOf(id));
@@ -180,7 +169,49 @@ public class SpecificationServiceImpl implements SpecificationService {
 		return  object;
 	}
 	
+	//关联案例（提问，报价单）个数
+	private void guanlianInfo(SearchHit  hits,SpecificationVo  vo) {
+		Map<String, SearchHits> innerHits = hits.getInnerHits();//只有没有查询条件时，才有，因为有查询添加时，统计的个数不是总个数，所以有查询条件时，不返回innerHits了
+		System.out.println("innerHits:"+innerHits+":"+hits.getId());
+		if(innerHits != null && innerHits.size() > 0){
+			for (Entry<String, SearchHits> innerHit : innerHits.entrySet()) {
+				if(innerHit.getKey().equals("specificationQuestionsES")){
+					vo.setQuestionCount(Integer.valueOf(innerHit.getValue().getTotalHits()+""));
+				}else if (innerHit.getKey().equals("applicationCaseES")) {
+					vo.setCaseCount(Integer.valueOf(innerHit.getValue().getTotalHits()+""));
+				}else if (innerHit.getKey().equals("specificationQuotationES")) {
+					vo.setQuotationCount(Integer.valueOf(innerHit.getValue().getTotalHits()+""));
+				}
+			}
+		}else {
+			//案例统计个数
+			SearchQuery appQuery = new  NativeSearchQueryBuilder()
+					.withIndices(EsConstant.ES_INDEXNAME)//指定查询的索引库
+					.withTypes("applicationCaseES")//指定查询的类型
+					.withQuery(QueryBuilders.termQuery("sid", hits.getId()))
+					.build();
+			List<ApplicationCaseES> appList = elasticsearchTemplate.queryForList(appQuery, ApplicationCaseES.class);
+			vo.setCaseCount(appList == null?0:appList.size());
+			//物性提问统计个数
+			SearchQuery questQuery = new  NativeSearchQueryBuilder()
+					.withIndices(EsConstant.ES_INDEXNAME)//指定查询的索引库
+					.withTypes("specificationQuestionsES")//指定查询的类型
+					.withQuery(QueryBuilders.termQuery("sid", hits.getId()))
+					.build();
+			List<SpecificationQuestionsES> questList = elasticsearchTemplate.queryForList(questQuery, SpecificationQuestionsES.class);
+			vo.setQuestionCount(questList == null ? 0 : questList.size());
+			//物性报价单统计个数
+			SearchQuery quotaQuery = new  NativeSearchQueryBuilder()
+					.withIndices(EsConstant.ES_INDEXNAME)//指定查询的索引库
+					.withTypes("specificationQuotationES")//指定查询的类型
+					.withQuery(QueryBuilders.termQuery("sid", hits.getId()))
+					.build();
+			List<SpecificationQuotationES> quotaList = elasticsearchTemplate.queryForList(quotaQuery, SpecificationQuotationES.class);
+			vo.setQuotationCount(quotaList == null ? 0 : quotaList.size());
+		}
+	}
 	
+
 	//创建要插入的文档对象
 	private   List<IndexQuery>  getSpecificatioIndexQuerys(List<SpecificationES> list){
 		List<IndexQuery> indexQuerys = new  ArrayList<>();

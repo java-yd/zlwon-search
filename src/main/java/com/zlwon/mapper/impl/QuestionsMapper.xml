@@ -8,4 +8,10 @@
 	WHERE  que.info_class=1  AND  que.examine=1 AND  cus.del=1
   </select>
   
+  <select id="selectAllApplicationCaseQuestions" resultType="com.zlwon.pojo.es.ApplicationCaseQuestionsES">
+    SELECT   que.id,que.title,que.content,que.iid applicationCaseId,que.create_time createTime,que.uid,cus.nickname,cus.headerimg,cus.intro  FROM   zl_questions  que
+	LEFT   JOIN   zl_customer  cus   ON  que.uid = cus.id
+	WHERE  que.info_class=2  AND  que.examine=1 AND  cus.del=1
+  </select>
+  
 </mapper>

@@ -12,6 +12,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.join.query.HasChildQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder.Field;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.junit.Test;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.ResultsExtractor;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
@@ -29,6 +31,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.zlwon.pojo.constant.EsConstant;
 import com.zlwon.pojo.es.ApplicationCaseES;
+import com.zlwon.pojo.es.ApplicationCaseQuestionsES;
 import com.zlwon.pojo.es.SpecificationES;
 import com.zlwon.pojo.es.SpecificationQuestionsES;
 import com.zlwon.pojo.es.SpecificationQuotationES;
@@ -58,7 +61,9 @@ public class ElasticsearchTemplateUtilsTest {
 		indexClass.add(ApplicationCaseES.class);
 		indexClass.add(SpecificationQuestionsES.class);
 		indexClass.add(SpecificationQuotationES.class);
+		indexClass.add(ApplicationCaseQuestionsES.class);
 		List<Class> mappingClass = new  ArrayList<>();
+		mappingClass.add(ApplicationCaseQuestionsES.class);
 		mappingClass.add(SpecificationQuotationES.class);
 		mappingClass.add(SpecificationQuestionsES.class);
 		mappingClass.add(ApplicationCaseES.class);
@@ -182,5 +187,17 @@ public class ElasticsearchTemplateUtilsTest {
 		applicationCase.setTitle("哈哈");
 		applicationCase.setEmptyField(EsConstant.APPLICATIONCASEES_EMPTYFIELD_VALUE);
 		return  JsonUtils.objectToJson(applicationCase);
+	}
+	
+	
+	@Test
+	public  void   testCount(){
+		SearchQuery query = new  NativeSearchQueryBuilder()
+				.withIndices(EsConstant.ES_INDEXNAME)//指定查询的索引库
+				.withTypes("applicationCaseES")//指定查询的类型
+				.withQuery(QueryBuilders.matchPhraseQuery("title", "奶瓶"))
+				.build();
+		List<ApplicationCaseES> queryForList = elasticsearchTemplate.queryForList(query, ApplicationCaseES.class);
+		System.out.println("案例个数:"+queryForList.size());
 	}
 }

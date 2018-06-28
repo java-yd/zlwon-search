@@ -6,10 +6,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.InnerHitBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.join.query.HasChildQueryBuilder;
 import org.elasticsearch.join.query.HasParentQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
@@ -92,6 +94,7 @@ public class ApplicationCaseServiceImpl implements ApplicationCaseService {
 		}else{
 			boolQuery
 				.should(QueryBuilders.matchQuery("emptyField", EsConstant.APPLICATIONCASEES_EMPTYFIELD_VALUE))//should是必须要满足一个，所以在ApplicationCaseES设置了一个匹配字符串,否则会造成数据丢失
+				.should(new HasChildQueryBuilder("applicationCaseQuestionsES", QueryBuilders.matchAllQuery(), ScoreMode.Total).innerHit(new InnerHitBuilder()))//默认查询，按提问个数排序
 				.should(new HasParentQueryBuilder("specificationES",QueryBuilders.matchAllQuery(),false).innerHit(new InnerHitBuilder()));
 		}
 		
@@ -147,26 +150,28 @@ public class ApplicationCaseServiceImpl implements ApplicationCaseService {
 	private   void   getSpecificationName(SearchHit hit,ApplicationCaseVo  vo){
 		Map<String, SearchHits> innerHits = hit.getInnerHits();
 		for (Entry<String, SearchHits> entry : innerHits.entrySet()) {
-			SearchHits hits2 = entry.getValue();//关键字搜索不到物性规格昵称，这里会返回null，所以要单独回去物性规格昵称
-			if(hits2.getTotalHits() == 0){
-				//需要根据物性id，得到物性规格名称
-				Map<String, SearchHitField> fields = hit.getFields();
-				for (Entry<String, SearchHitField> searchHitField : fields.entrySet()) {
-					Object parentId= searchHitField.getValue().getValues().get(0);
-					SpecificationES specificationES = specificationService.findOneSpecificationById(parentId+"");
-					vo.setName(specificationES == null ? "" : specificationES.getName());
+			if(entry.getKey().equals("specificationES")){
+				SearchHits hits2 = entry.getValue();//关键字搜索不到物性规格昵称，这里会返回null，所以要单独获取物性规格昵称
+				if(hits2.getTotalHits() == 0){
+					//需要根据物性id，得到物性规格名称
+					Map<String, SearchHitField> fields = hit.getFields();
+					for (Entry<String, SearchHitField> searchHitField : fields.entrySet()) {
+						Object parentId= searchHitField.getValue().getValues().get(0);
+						SpecificationES specificationES = specificationService.findOneSpecificationById(parentId+"");
+						vo.setName(specificationES == null ? "" : specificationES.getName());
+						break;
+					}
 					break;
 				}
-				break;
-			}
-			SearchHit searchHit = hits2.getHits()[0];
-			Map<String, Object> source = searchHit.getSource();
-			vo.setName(source.get("name") == null?"":source.get("name").toString());
-			Map<String, HighlightField> highlightFields = searchHit.getHighlightFields();
-			for (Entry<String, HighlightField> nameEntry : highlightFields.entrySet()) {
-				HighlightField highlightField = nameEntry.getValue();
-				if(highlightField.getName().equals("name")){
-					vo.setName(highlightField.fragments()[0].toString());
+				SearchHit searchHit = hits2.getHits()[0];
+				Map<String, Object> source = searchHit.getSource();
+				vo.setName(source.get("name") == null?"":source.get("name").toString());
+				Map<String, HighlightField> highlightFields = searchHit.getHighlightFields();
+				for (Entry<String, HighlightField> nameEntry : highlightFields.entrySet()) {
+					HighlightField highlightField = nameEntry.getValue();
+					if(highlightField.getName().equals("name")){
+						vo.setName(highlightField.fragments()[0].toString());
+					}
 				}
 			}
 		}
@@ -191,7 +196,7 @@ public class ApplicationCaseServiceImpl implements ApplicationCaseService {
 			query.setId(applicationCaseES.getId().toString());
 			query.setIndexName(EsConstant.ES_INDEXNAME);
 			query.setType("applicationCaseES");
-			query.setParentId(applicationCaseES.getSid());
+			query.setParentId(applicationCaseES.getSpecificationId());
 			query.setSource(getApplicationCaseSource(applicationCaseES));
 			indexQuerys.add(query);
 		}
@@ -202,7 +207,8 @@ public class ApplicationCaseServiceImpl implements ApplicationCaseService {
 	private String getApplicationCaseSource(ApplicationCaseES applicationCaseES) {
 		ApplicationCaseDocument  document = new  ApplicationCaseDocument();
 		BeanUtils.copyProperties(applicationCaseES, document);
-		applicationCaseES.setEmptyField(EsConstant.APPLICATIONCASEES_EMPTYFIELD_VALUE);
+		document.setEmptyField(EsConstant.APPLICATIONCASEES_EMPTYFIELD_VALUE);
+		document.setSid(applicationCaseES.getSpecificationId());
 		return JsonUtils.objectToJson(document);
 	}
 }
