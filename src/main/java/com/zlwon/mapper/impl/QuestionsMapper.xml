@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zlwon.mapper.QuestionsMapper" >
+
+  <select id="selectAllSpecificationQuestions" resultType="com.zlwon.pojo.es.SpecificationQuestionsES">
+    SELECT   que.id,que.title,que.content,que.iid specificationId,que.create_time createTime,que.uid,cus.nickname,cus.headerimg,cus.intro  FROM   zl_questions  que
+	LEFT   JOIN   zl_customer  cus   ON  que.uid = cus.id
+	WHERE  que.info_class=1  AND  que.examine=1 AND  cus.del=1
+  </select>
+  
+</mapper>

@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zlwon.service.ApplicationCaseService;
+import com.zlwon.service.SpecificationQuestionsService;
+import com.zlwon.service.SpecificationQuotationService;
 import com.zlwon.service.SpecificationService;
 
 @RestController
@@ -15,6 +17,10 @@ public class JobController {
 	private  SpecificationService  specificationService;
 	@Autowired
 	private  ApplicationCaseService  applicationCaseService;
+	@Autowired
+	private  SpecificationQuestionsService  specificationQuestionsService;
+	@Autowired
+	private  SpecificationQuotationService  specificationQuotationService;
 
 	/**
 	 * 物性表添加到文档中
@@ -35,4 +41,24 @@ public class JobController {
 		applicationCaseService.addApplicationCaseDocument();
 		return  "success";
 	}
+	
+	/**
+	 * 添加物性提问到文档中
+	 * @return
+	 */
+	@RequestMapping("addSpecificationQuestionsDocument")
+	public   String    addSpecificationQuestionsDocument(){
+		specificationQuestionsService.addSpecificationQuestionsDocument();
+		return  "success";
+	}
+	
+	/**
+	 * 添加报价单到文档中
+	 */
+	@RequestMapping("addSpecificationQuotationDocument")
+	public   String   addSpecificationQuotationDocument(){
+		specificationQuotationService.addSpecificationQuotationDocument();
+		return  "success";
+	}
+	
 }

@@ -21,4 +21,8 @@ public class SpecificationVo {
 	
 	private  Integer  caseCount;//关联的案例个数
 	
+	private  Integer  questionCount;//提问个数
+	
+	private  Integer  quotationCount;//报价单个数
+	
 }

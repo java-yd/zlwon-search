@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.ResultsExtractor;
+import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
@@ -100,13 +102,16 @@ public class SpecificationServiceImpl implements SpecificationService {
 		if(StringUtils.isNotBlank(searchText)){
 			boolQuery
 				.should(QueryBuilders.multiMatchQuery(searchText, "name","content").boost(2))//增加评分
-				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.multiMatchQuery(searchText,"appProduct","title","selectRequirements","selectCause","setting"), ScoreMode.Total).innerHit(new InnerHitBuilder()));
+				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.multiMatchQuery(searchText,"appProduct","title","selectRequirements","selectCause","setting"), ScoreMode.None).innerHit(new InnerHitBuilder()))
+				.should(new HasChildQueryBuilder("specificationQuestionsES", QueryBuilders.matchAllQuery(), ScoreMode.None).innerHit(new InnerHitBuilder()))
+				.should(new HasChildQueryBuilder("specificationQuotationES", QueryBuilders.matchAllQuery(), ScoreMode.None).innerHit(new InnerHitBuilder()));
 		}else {
 			boolQuery
 				.should(QueryBuilders.matchQuery("emptyField", EsConstant.SPECIFICATIONES_EMPTYFIELD_VALUE))//should是必须要满足一个，所以在SpecificationES设置了一个匹配字符串,否则会造成数据丢失
-				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.matchAllQuery(), ScoreMode.Total).innerHit(new InnerHitBuilder()));
+				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.matchAllQuery(), ScoreMode.Total).innerHit(new InnerHitBuilder()))
+				.should(new HasChildQueryBuilder("specificationQuestionsES", QueryBuilders.matchAllQuery(), ScoreMode.Total).innerHit(new InnerHitBuilder()))
+				.should(new HasChildQueryBuilder("specificationQuotationES", QueryBuilders.matchAllQuery(), ScoreMode.Total).innerHit(new InnerHitBuilder()));
 		}
-		
 		
 		SearchQuery query = new  NativeSearchQueryBuilder()
 				.withIndices(EsConstant.ES_INDEXNAME)//指定查询的索引库
@@ -134,11 +139,17 @@ public class SpecificationServiceImpl implements SpecificationService {
 				for (int i = 0; i < hits.length; i++) {
 					vo = new SpecificationVo();
 					
-					//关联案例个数
+					//关联案例（提问）个数
 					Map<String, SearchHits> innerHits = hits[i].getInnerHits();
 					if(innerHits != null && innerHits.size() > 0){
 						for (Entry<String, SearchHits> innerHit : innerHits.entrySet()) {
-							vo.setCaseCount(Integer.valueOf(innerHit.getValue().getTotalHits()+""));
+							if(innerHit.getKey().equals("specificationQuestionsES")){
+								vo.setQuestionCount(Integer.valueOf(innerHit.getValue().getTotalHits()+""));
+							}else if (innerHit.getKey().equals("applicationCaseES")) {
+								vo.setCaseCount(Integer.valueOf(innerHit.getValue().getTotalHits()+""));
+							}else if (innerHit.getKey().equals("specificationQuotationES")) {
+								vo.setQuotationCount(Integer.valueOf(innerHit.getValue().getTotalHits()+""));
+							}
 						}
 					}
 					
