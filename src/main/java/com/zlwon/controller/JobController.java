@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zlwon.service.ApplicationCaseQuestionsService;
 import com.zlwon.service.ApplicationCaseService;
+import com.zlwon.service.SpecificationCharacteristicService;
 import com.zlwon.service.SpecificationQuestionsService;
 import com.zlwon.service.SpecificationQuotationService;
 import com.zlwon.service.SpecificationService;
@@ -24,6 +25,8 @@ public class JobController {
 	private  SpecificationQuotationService  specificationQuotationService;
 	@Autowired
 	private  ApplicationCaseQuestionsService  applicationCaseQuestionsService;
+	@Autowired
+	private  SpecificationCharacteristicService  specificationCharacteristicService;
 
 	/**
 	 * 物性表添加到文档中
@@ -73,4 +76,13 @@ public class JobController {
 		return  "success";
 	}
 	
+	/**
+	 * 添加物性标签到文档中
+	 * @return
+	 */
+	@RequestMapping("addSpecificationCharacteristicDocument")
+	public  String   addSpecificationCharacteristicDocument(){
+		specificationCharacteristicService.addSpecificationCharacteristicDocument();
+		return  "success";
+	}
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zlwon.mapper.CharacteristicMapper" >
+  
+  <!-- 得到所有标签 -->
+  <select id="selectAllCharacteristic" resultType="com.zlwon.pojo.es.SpecificationCharacteristicES">
+    SELECT   id,spec_id specificationId,label_name labelName  FROM   zl_characteristic   WHERE   examine = 1
+  </select>
+  
+  
+</mapper>

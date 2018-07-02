@@ -103,6 +103,7 @@ public class SpecificationServiceImpl implements SpecificationService {
 		if(StringUtils.isNotBlank(searchText)){
 			boolQuery
 				.should(QueryBuilders.multiMatchQuery(searchText, "name","content").boost(2))//增加评分
+				.should(new HasChildQueryBuilder("specificationCharacteristicES", QueryBuilders.matchQuery("labelName", searchText), ScoreMode.None))
 				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.multiMatchQuery(searchText,"appProduct","title","selectRequirements","selectCause","setting"), ScoreMode.None));//子个数是查询条件匹配的个数，不是总个数，坑
 //				.should(new HasChildQueryBuilder("specificationQuestionsES", QueryBuilders.boolQuery(), ScoreMode.None).innerHit(new InnerHitBuilder()))
 //				.should(new HasChildQueryBuilder("specificationQuotationES", QueryBuilders.disMaxQuery(), ScoreMode.None).innerHit(new InnerHitBuilder()))
@@ -172,7 +173,6 @@ public class SpecificationServiceImpl implements SpecificationService {
 	//关联案例（提问，报价单）个数
 	private void guanlianInfo(SearchHit  hits,SpecificationVo  vo) {
 		Map<String, SearchHits> innerHits = hits.getInnerHits();//只有没有查询条件时，才有，因为有查询添加时，统计的个数不是总个数，所以有查询条件时，不返回innerHits了
-		System.out.println("innerHits:"+innerHits+":"+hits.getId());
 		if(innerHits != null && innerHits.size() > 0){
 			for (Entry<String, SearchHits> innerHit : innerHits.entrySet()) {
 				if(innerHit.getKey().equals("specificationQuestionsES")){

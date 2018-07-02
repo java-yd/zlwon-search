@@ -28,7 +28,7 @@ public class SearchController {
 	 * @return
 	 */
 	@RequestMapping(value="querySpecification",method=RequestMethod.GET)
-	public   Object   querySpecification(@RequestParam(defaultValue="1")Integer  pageIndex,
+	public   Object   querySpecification(@RequestParam(defaultValue="1",name="currentPage")Integer  pageIndex,
 			@RequestParam(defaultValue="10")Integer  pageSize,SpecificationDTO specificationDTO){
 		Object object = specificationService.findSpecification(pageIndex,pageSize,specificationDTO);
 		return  object;
