@@ -155,31 +155,33 @@ public class QuestionsServiceImpl implements QuestionsService {
 		
 		//1如果innerHits不为null，说明有关键字搜索，需要查看
 		Map<String, SearchHits> innerHits = hits.getInnerHits();
-		for (Entry<String, SearchHits> entry : innerHits.entrySet()) {
-			if(entry.getKey().equals("specificationQuestionsAnswerES") && type.equals("specificationQuestionsES")){
-				SearchHits hits2 = entry.getValue();
-				SearchHit[] searchHits = hits2.getHits();
-				if(searchHits == null || searchHits.length <= 0)
-					break;
-				SearchHit searchHit = searchHits[0];
-				Map<String, HighlightField> highlightFields = searchHit.getHighlightFields();
-				for (Entry<String, HighlightField> nameEntry : highlightFields.entrySet()) {
-					HighlightField highlightField = nameEntry.getValue();
-					if(highlightField.getName().equals("content")){
-						vo.setAnswerPri(highlightField.fragments()[0].toString());
+		if(innerHits != null){
+			for (Entry<String, SearchHits> entry : innerHits.entrySet()) {
+				if(entry.getKey().equals("specificationQuestionsAnswerES") && type.equals("specificationQuestionsES")){
+					SearchHits hits2 = entry.getValue();
+					SearchHit[] searchHits = hits2.getHits();
+					if(searchHits == null || searchHits.length <= 0)
+						break;
+					SearchHit searchHit = searchHits[0];
+					Map<String, HighlightField> highlightFields = searchHit.getHighlightFields();
+					for (Entry<String, HighlightField> nameEntry : highlightFields.entrySet()) {
+						HighlightField highlightField = nameEntry.getValue();
+						if(highlightField.getName().equals("content")){
+							vo.setAnswerPri(highlightField.fragments()[0].toString());
+						}
 					}
-				}
-			}else if(entry.getKey().equals("applicationCaseQuestionsAnswerES") && type.equals("applicationCaseQuestionsES")){
-				SearchHits hits2 = entry.getValue();
-				SearchHit[] searchHits = hits2.getHits();
-				if(searchHits == null || searchHits.length <= 0)
-					break;
-				SearchHit searchHit = searchHits[0];
-				Map<String, HighlightField> highlightFields = searchHit.getHighlightFields();
-				for (Entry<String, HighlightField> nameEntry : highlightFields.entrySet()) {
-					HighlightField highlightField = nameEntry.getValue();
-					if(highlightField.getName().equals("content")){
-						vo.setAnswerPri(highlightField.fragments()[0].toString());
+				}else if(entry.getKey().equals("applicationCaseQuestionsAnswerES") && type.equals("applicationCaseQuestionsES")){
+					SearchHits hits2 = entry.getValue();
+					SearchHit[] searchHits = hits2.getHits();
+					if(searchHits == null || searchHits.length <= 0)
+						break;
+					SearchHit searchHit = searchHits[0];
+					Map<String, HighlightField> highlightFields = searchHit.getHighlightFields();
+					for (Entry<String, HighlightField> nameEntry : highlightFields.entrySet()) {
+						HighlightField highlightField = nameEntry.getValue();
+						if(highlightField.getName().equals("content")){
+							vo.setAnswerPri(highlightField.fragments()[0].toString());
+						}
 					}
 				}
 			}

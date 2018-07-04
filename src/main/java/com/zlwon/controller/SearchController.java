@@ -53,7 +53,7 @@ public class SearchController {
 	 * @return
 	 */
 	@RequestMapping(value="queryQuestions",method=RequestMethod.GET)
-	public   Object   queryQuestions(@RequestParam(defaultValue="1")Integer  pageIndex,
+	public   Object   queryQuestions(@RequestParam(defaultValue="1",name="currentPage")Integer  pageIndex,
 			@RequestParam(defaultValue="10")Integer  pageSize,String key){
 		Object object = QuestionsService.findQuestions(pageIndex,pageSize,key);
 		return   object;
