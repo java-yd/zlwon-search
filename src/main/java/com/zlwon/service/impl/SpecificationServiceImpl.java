@@ -64,7 +64,7 @@ public class SpecificationServiceImpl implements SpecificationService {
 	 * @return
 	 */
 	public SpecificationES findOneSpecificationById(String   id) {
-		return  ElasticsearchTemplateUtils.queryOneSpecificationById(id,SpecificationES.class,elasticsearchTemplate);
+		return  ElasticsearchTemplateUtils.queryOneDocumentById(id,SpecificationES.class,elasticsearchTemplate);
 	}
 	
 	/**
@@ -104,7 +104,7 @@ public class SpecificationServiceImpl implements SpecificationService {
 			boolQuery
 				.should(QueryBuilders.multiMatchQuery(searchText, "name","content").boost(2))//增加评分
 				.should(new HasChildQueryBuilder("specificationCharacteristicES", QueryBuilders.matchQuery("labelName", searchText), ScoreMode.None))
-				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.multiMatchQuery(searchText,"appProduct","title","selectRequirements","selectCause","setting"), ScoreMode.None));//子个数是查询条件匹配的个数，不是总个数，坑
+				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.multiMatchQuery(searchText,"appProduct","title"), ScoreMode.None));//子个数是查询条件匹配的个数，不是总个数，坑
 //				.should(new HasChildQueryBuilder("specificationQuestionsES", QueryBuilders.boolQuery(), ScoreMode.None).innerHit(new InnerHitBuilder()))
 //				.should(new HasChildQueryBuilder("specificationQuotationES", QueryBuilders.disMaxQuery(), ScoreMode.None).innerHit(new InnerHitBuilder()))
 		}else {
@@ -141,8 +141,8 @@ public class SpecificationServiceImpl implements SpecificationService {
 				for (int i = 0; i < hits.length; i++) {
 					vo = new SpecificationVo();
 					
-					//关联案例（提问，报价单）个数
-					guanlianInfo(hits[i],vo);
+					//统计案例（提问，报价单）个数
+					count(hits[i],vo);
 					
 					String id = hits[i].getId();
 					vo.setId(Integer.valueOf(id));
@@ -170,8 +170,8 @@ public class SpecificationServiceImpl implements SpecificationService {
 		return  object;
 	}
 	
-	//关联案例（提问，报价单）个数
-	private void guanlianInfo(SearchHit  hits,SpecificationVo  vo) {
+	//统计案例（提问，报价单）个数
+	private void count(SearchHit  hits,SpecificationVo  vo) {
 		Map<String, SearchHits> innerHits = hits.getInnerHits();//只有没有查询条件时，才有，因为有查询添加时，统计的个数不是总个数，所以有查询条件时，不返回innerHits了
 		if(innerHits != null && innerHits.size() > 0){
 			for (Entry<String, SearchHits> innerHit : innerHits.entrySet()) {

@@ -29,9 +29,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.zlwon.pojo.constant.EsConstant;
 import com.zlwon.pojo.es.ApplicationCaseES;
+import com.zlwon.pojo.es.ApplicationCaseQuestionsAnswerES;
 import com.zlwon.pojo.es.ApplicationCaseQuestionsES;
+import com.zlwon.pojo.es.CustomerES;
 import com.zlwon.pojo.es.SpecificationCharacteristicES;
 import com.zlwon.pojo.es.SpecificationES;
+import com.zlwon.pojo.es.SpecificationQuestionsAnswerES;
 import com.zlwon.pojo.es.SpecificationQuestionsES;
 import com.zlwon.pojo.es.SpecificationQuotationES;
 import com.zlwon.pojo.es.document.ApplicationCaseDocument;
@@ -62,7 +65,13 @@ public class ElasticsearchTemplateUtilsTest {
 		indexClass.add(SpecificationQuotationES.class);
 		indexClass.add(ApplicationCaseQuestionsES.class);
 		indexClass.add(SpecificationCharacteristicES.class);
+		indexClass.add(CustomerES.class);
+		indexClass.add(SpecificationQuestionsAnswerES.class);
+		indexClass.add(ApplicationCaseQuestionsAnswerES.class);
 		List<Class> mappingClass = new  ArrayList<>();
+		mappingClass.add(SpecificationQuestionsAnswerES.class);
+		mappingClass.add(ApplicationCaseQuestionsAnswerES.class);
+		mappingClass.add(CustomerES.class);
 		mappingClass.add(SpecificationCharacteristicES.class);
 		mappingClass.add(ApplicationCaseQuestionsES.class);
 		mappingClass.add(SpecificationQuotationES.class);
@@ -149,7 +158,7 @@ public class ElasticsearchTemplateUtilsTest {
 	 */
 	@Test
 	public  void   testQueryOneSpecificationById(){
-		SpecificationES specificationES = ElasticsearchTemplateUtils.queryOneSpecificationById(4078+"", SpecificationES.class, elasticsearchTemplate);
+		SpecificationES specificationES = ElasticsearchTemplateUtils.queryOneDocumentById(4078+"", SpecificationES.class, elasticsearchTemplate);
 		System.out.println(specificationES);
 	}
 	
@@ -201,4 +210,5 @@ public class ElasticsearchTemplateUtilsTest {
 		List<ApplicationCaseES> queryForList = elasticsearchTemplate.queryForList(query, ApplicationCaseES.class);
 		System.out.println("案例个数:"+queryForList.size());
 	}
+	
 }

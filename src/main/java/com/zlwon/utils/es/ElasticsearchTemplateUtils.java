@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.GetQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
+import org.springframework.data.elasticsearch.core.query.StringQuery;
 
 public class ElasticsearchTemplateUtils {
 	
@@ -17,7 +18,7 @@ public class ElasticsearchTemplateUtils {
 	 * @param elasticsearchTemplat
 	 * @return
 	 */
-	public static <T> T queryOneSpecificationById(String   id,Class<T>  clazz,ElasticsearchTemplate  elasticsearchTemplat) {
+	public static <T> T queryOneDocumentById(String   id,Class<T>  clazz,ElasticsearchTemplate  elasticsearchTemplat) {
 		GetQuery query = new GetQuery();
 		query.setId(id);
 		return   elasticsearchTemplat.queryForObject(query , clazz);

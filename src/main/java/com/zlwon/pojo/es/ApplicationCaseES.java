@@ -35,6 +35,9 @@ public class ApplicationCaseES {
 	@Field(type=FieldType.Text,analyzer="ik_max_word",searchAnalyzer="ik_max_word")
 	private String appProduct;  //应用产品名称
 	
+	@Field(type=FieldType.Text,analyzer="ik_max_word",searchAnalyzer="ik_max_word")
+	private String terminal;//终端客户
+	
 	@Field(type=FieldType.Integer)
 	private Integer industryId;  //应用行业ID
 	

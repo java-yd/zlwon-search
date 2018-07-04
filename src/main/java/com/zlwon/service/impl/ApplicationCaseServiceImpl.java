@@ -60,6 +60,7 @@ public class ApplicationCaseServiceImpl implements ApplicationCaseService {
 		return  executeQuery(pageIndex,pageSize,applicationCaseDTO);
 	}
 	
+	
 	//案例搜索-创建查询条件
 	private  SearchQuery   createSearchQuery(ApplicationCaseDTO applicationCaseDTO,Integer pageIndex,Integer pageSize){
 		BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
@@ -87,9 +88,9 @@ public class ApplicationCaseServiceImpl implements ApplicationCaseService {
 		String searchText = applicationCaseDTO.getKey();//关键字
 		if(StringUtils.isNotBlank(searchText)){
 			boolQuery
-				.should(QueryBuilders.multiMatchQuery(searchText, "title","appProduct","selectRequirements","selectCause","setting"))
+				.should(QueryBuilders.multiMatchQuery(searchText, "title","appProduct","terminal","selectRequirements","selectCause","setting"))
 				.should(
-						new HasParentQueryBuilder("specificationES",QueryBuilders.multiMatchQuery(searchText,"name","content"), false) //false好像是不参与评分
+						new HasParentQueryBuilder("specificationES",QueryBuilders.matchQuery("name", searchText), false) //false好像是不参与评分
 							.innerHit(new InnerHitBuilder().setHighlightBuilder(new HighlightBuilder().field("name"))));//查询结果显示父数据，并设置父数据中name为高亮显示
 		}else{
 			boolQuery
@@ -176,6 +177,7 @@ public class ApplicationCaseServiceImpl implements ApplicationCaseService {
 			}
 		}
 	}
+	
 	
 	/**
 	 * 添加案例到文档中

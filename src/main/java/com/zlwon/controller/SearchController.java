@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zlwon.pojo.dto.ApplicationCaseDTO;
 import com.zlwon.pojo.dto.SpecificationDTO;
 import com.zlwon.service.ApplicationCaseService;
+import com.zlwon.service.QuestionsService;
 import com.zlwon.service.SpecificationService;
 
 @RestController
@@ -22,6 +23,8 @@ public class SearchController {
 	private  SpecificationService  specificationService;
 	@Autowired
 	private  ApplicationCaseService  applicationCaseService;
+	@Autowired
+	private  QuestionsService  QuestionsService;
 
 	/**
 	 * 物性搜索
@@ -42,6 +45,17 @@ public class SearchController {
 	public   Object   queryApplicationCase(@RequestParam(defaultValue="1")Integer  pageIndex,
 			@RequestParam(defaultValue="10")Integer  pageSize,ApplicationCaseDTO applicationCaseDTO){
 		Object object = applicationCaseService.findApplicationCase(pageIndex,pageSize,applicationCaseDTO);
+		return   object;
+	}
+	
+	/**
+	 * 问答搜索
+	 * @return
+	 */
+	@RequestMapping(value="queryQuestions",method=RequestMethod.GET)
+	public   Object   queryQuestions(@RequestParam(defaultValue="1")Integer  pageIndex,
+			@RequestParam(defaultValue="10")Integer  pageSize,String key){
+		Object object = QuestionsService.findQuestions(pageIndex,pageSize,key);
 		return   object;
 	}
 }

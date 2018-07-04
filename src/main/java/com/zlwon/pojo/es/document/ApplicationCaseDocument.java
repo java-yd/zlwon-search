@@ -18,6 +18,8 @@ public class ApplicationCaseDocument {
 	
 	private String appProduct;  //应用产品名称
 	
+	private String terminal;//终端客户
+	
 	private Integer industryId;  //应用行业ID
 	
 	private String marketId;  //应用市场ID

@@ -55,6 +55,8 @@ public class ApplicationCaseQuestionsServiceImpl implements ApplicationCaseQuest
 	private String getApplicationCaseQuestionSource(ApplicationCaseQuestionsES applicationCaseQuestionsES) {
 		ApplicationCaseQuestionsDocument  document = new  ApplicationCaseQuestionsDocument();
 		BeanUtils.copyProperties(applicationCaseQuestionsES, document);
+		document.setAid(applicationCaseQuestionsES.getApplicationCaseId());
+		document.setInfoClass(2);
 		return JsonUtils.objectToJson(document);
 	}
 

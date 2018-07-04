@@ -4,9 +4,10 @@
     <!-- 得到所有案例-->
     <select id="selectAllApplicationCase" resultType="com.zlwon.pojo.es.ApplicationCaseES" >
         SELECT  app.id,app.sid specificationId,app.title,par.name appProduct,app.industry_id industryId,app.market_id  marketId,
-		app.select_requirements selectRequirements,app.select_cause selectCause,app.setting,app.photo,app.create_time createTime
+		app.select_requirements selectRequirements,app.select_cause selectCause,app.setting,app.photo,app.create_time createTime,par2.name terminal
 		FROM    zl_application_case   app
 		LEFT   JOIN   zl_specification_parameter  par   ON  par.id = app.app_product_id   AND   par.class_type = 9
+		LEFT   JOIN   zl_specification_parameter  par2  ON  par2.id = app.terminal_id     AND   par2.class_type = 8
 		WHERE  app.del = 1 AND  app.examine = 1
     </select>
 </mapper>

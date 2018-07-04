@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zlwon.service.AnswerService;
 import com.zlwon.service.ApplicationCaseQuestionsService;
 import com.zlwon.service.ApplicationCaseService;
+import com.zlwon.service.CustomerService;
 import com.zlwon.service.SpecificationCharacteristicService;
 import com.zlwon.service.SpecificationQuestionsService;
 import com.zlwon.service.SpecificationQuotationService;
@@ -27,6 +29,10 @@ public class JobController {
 	private  ApplicationCaseQuestionsService  applicationCaseQuestionsService;
 	@Autowired
 	private  SpecificationCharacteristicService  specificationCharacteristicService;
+	@Autowired
+	private  CustomerService  customerService;
+	@Autowired
+	private  AnswerService  answerService;
 
 	/**
 	 * 物性表添加到文档中
@@ -83,6 +89,26 @@ public class JobController {
 	@RequestMapping("addSpecificationCharacteristicDocument")
 	public  String   addSpecificationCharacteristicDocument(){
 		specificationCharacteristicService.addSpecificationCharacteristicDocument();
+		return  "success";
+	}
+	
+	/**
+	 * 添加用户到文档中
+	 * @return
+	 */
+	@RequestMapping("addCustomerDocument")
+	public  String   addCustomerDocument(){
+		customerService.addCustomerDocument();
+		return  "success";
+	}
+	
+	/**
+	 * 回答添加到文档中
+	 * @return
+	 */
+	@RequestMapping("addAnswerDocument")
+	public  String   addAnswerDocument(){
+		answerService.addAnswerDocument();
 		return  "success";
 	}
 }

@@ -8,4 +8,6 @@ public class EsConstant {
 	
 	public   static   final   String   APPLICATIONCASEES_EMPTYFIELD_VALUE = "applicationCaseesEmptyfield";//案例文档匹配字段的值
 	
+//	public   static   final   String   QUESTIONS_EMPTYFIELD_VALUE = "questionsesEmptyfield";//问答文档匹配字段的值
+	
 }

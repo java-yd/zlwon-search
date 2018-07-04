@@ -1,5 +1,7 @@
 package com.zlwon.pojo.es;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
@@ -25,17 +27,17 @@ public class ApplicationCaseQuestionsES {
 	@Parent(type="applicationCaseES")
 	private  String    applicationCaseId;//案例id
 	
-	@Field(type=FieldType.Text,index=false)
-	private  String    nickname;//提问用户昵称
+	@Field(type=FieldType.Integer,index=false)
+	private  Integer  infoClass;//来源类别：2:案例
 	
-	@Field(type=FieldType.Text,index=false)
-	private  Integer   uid;//提问用户id
+	@Field(type=FieldType.Text)
+	private  String   aid;//案例id：CMS系统案例标题修改时匹配，从而修改该文档案例标题,由于父案例继承物性，使用HasParentQueryBuilder会无法匹配
 	
-	@Field(type=FieldType.Text,index=false)
-	private  String    headerimg;//提问用户头像
+	@Field(type=FieldType.Text,analyzer="ik_max_word",searchAnalyzer="ik_max_word")
+	private  String   source;//案例标题，
 	
-	@Field(type=FieldType.Text,index=false)
-	private  String    intro;//提问用户一句话介绍
+	@Field(type=FieldType.Integer,index=false)
+	private  Integer  uid;//提问者id,对应CustomerEs文档的id
 	
 	@Field(type=FieldType.Date)
 	private  Date      createTime;//提问时间
@@ -46,4 +48,6 @@ public class ApplicationCaseQuestionsES {
 	@Field(type=FieldType.Text,analyzer="ik_max_word",searchAnalyzer="ik_max_word")
 	private  String    content;//提问内容
 	
+	@Field(type=FieldType.Integer)
+	private  Integer    answerCount;//回答个数，只是用来查询问题时，进行排序
 }
