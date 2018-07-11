@@ -22,5 +22,19 @@ public interface QuestionsMapper {
 	 * @return
 	 */
 	List<ApplicationCaseQuestionsES> selectAllApplicationCaseQuestions();
+	
+	/**
+	 * 根据物性提问id，得到物性提问信息
+	 * @param id
+	 * @return
+	 */
+	SpecificationQuestionsES selectSpecificationQuestionsById(Integer id);
+	
+	/**
+	 * 根据案例提问id，得到案例提问信息
+	 * @param id
+	 * @return
+	 */
+	ApplicationCaseQuestionsES selectApplicationCaseQuestionsById(Integer id);
 
 }

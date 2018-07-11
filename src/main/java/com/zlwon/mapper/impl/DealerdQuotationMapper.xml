@@ -7,4 +7,7 @@
   </select>
   
  
+ <select id="selectById" resultType="com.zlwon.pojo.es.SpecificationQuotationES" >
+    SELECT  id,sid specificationId,color   FROM   zl_dealerd_quotation  WHERE  examine = 1 AND CURDATE() &lt;= validity_date  AND id=#{id}
+  </select>
 </mapper>

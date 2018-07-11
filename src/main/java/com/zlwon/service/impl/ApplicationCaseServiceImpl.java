@@ -213,4 +213,23 @@ public class ApplicationCaseServiceImpl implements ApplicationCaseService {
 		document.setSid(applicationCaseES.getSpecificationId());
 		return JsonUtils.objectToJson(document);
 	}
+
+
+	/**
+	 * 添加(更新)案例信息
+	 * @param id 案例id
+	 */
+	@Override
+	public void addOrUpdateApplicationCase(Integer id) {
+		ApplicationCaseES  applicationCaseES = applicationCaseMapper.selectApplicationCaseById(id);
+		if(applicationCaseES != null){
+			IndexQuery indexQuery = new IndexQuery();
+			indexQuery.setId(applicationCaseES.getId().toString());
+			indexQuery.setIndexName(EsConstant.ES_INDEXNAME);
+			indexQuery.setType("applicationCaseES");
+			indexQuery.setParentId(applicationCaseES.getSpecificationId());
+			indexQuery.setSource(getApplicationCaseSource(applicationCaseES));
+			ElasticsearchTemplateUtils.addOneDocument(elasticsearchTemplate, indexQuery);
+		}
+	}
 }

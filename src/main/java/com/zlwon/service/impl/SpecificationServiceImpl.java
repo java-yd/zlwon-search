@@ -103,7 +103,7 @@ public class SpecificationServiceImpl implements SpecificationService {
 		if(StringUtils.isNotBlank(searchText)){
 			boolQuery
 				.should(QueryBuilders.multiMatchQuery(searchText, "name","content").boost(2))//增加评分
-				.should(new HasChildQueryBuilder("specificationCharacteristicES", QueryBuilders.matchQuery("labelName", searchText), ScoreMode.None))
+				.should(new HasChildQueryBuilder("specificationCharacteristicES", QueryBuilders.matchQuery("labelName", searchText), ScoreMode.Max))
 				.should(new HasChildQueryBuilder("applicationCaseES", QueryBuilders.multiMatchQuery(searchText,"appProduct","title"), ScoreMode.None));//子个数是查询条件匹配的个数，不是总个数，坑
 //				.should(new HasChildQueryBuilder("specificationQuestionsES", QueryBuilders.boolQuery(), ScoreMode.None).innerHit(new InnerHitBuilder()))
 //				.should(new HasChildQueryBuilder("specificationQuotationES", QueryBuilders.disMaxQuery(), ScoreMode.None).innerHit(new InnerHitBuilder()))
@@ -234,6 +234,23 @@ public class SpecificationServiceImpl implements SpecificationService {
 		BeanUtils.copyProperties(specificationES, document);
 		document.setEmptyField(EsConstant.SPECIFICATIONES_EMPTYFIELD_VALUE);
 		return JsonUtils.objectToJson(document);
+	}
+
+	
+	/**
+	 * 添加(更新)物性信息
+	 * @param id 物性id
+	 */
+	public void addOrUpdateSpecification(Integer id) {
+		SpecificationES  specificationES = specificationMapper.selectSpecificationById(id);
+		if(specificationES != null){
+			IndexQuery indexQuery = new IndexQuery();
+			indexQuery.setId(specificationES.getId().toString());
+			indexQuery.setIndexName(EsConstant.ES_INDEXNAME);
+			indexQuery.setType("specificationES");
+			indexQuery.setSource(getSpecificatioSource(specificationES));
+			ElasticsearchTemplateUtils.addOneDocument(elasticsearchTemplate, indexQuery);
+		}
 	}
 
 }

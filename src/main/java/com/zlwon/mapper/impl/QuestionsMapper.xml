@@ -20,4 +20,23 @@
 	WHERE  que.info_class=2  AND  que.examine=1 AND  cus.del=1 AND  app.del=1
   </select>
   
+  <!--  根据物性提问id，得到物性提问信息 -->
+  <select id="selectSpecificationQuestionsById" resultType="com.zlwon.pojo.es.SpecificationQuestionsES">
+    SELECT   que.id,que.title,que.content,que.iid specificationId,que.create_time createTime,que.uid,cus.nickname,cus.headerimg,cus.intro,spe.name   source,IF(answer.qid>0,answer.answerCount,0) answerCount
+    FROM   zl_questions  que
+	LEFT   JOIN   zl_customer  cus   ON  que.uid = cus.id
+	LEFT  JOIN   zl_specification  spe  ON   que.iid = spe.id
+	LEFT  JOIN   (SELECT  COUNT(qid) answerCount,qid FROM zl_answer WHERE examine = 1 GROUP  BY   qid )  answer  ON  que.id=answer.qid
+	WHERE  que.info_class=1  AND  que.examine=1 AND  cus.del=1  AND  que.id=#{id}
+  </select>
+  
+  <!-- 根据案例提问id，得到案例提问信息 -->
+  <select id="selectApplicationCaseQuestionsById" resultType="com.zlwon.pojo.es.ApplicationCaseQuestionsES">
+    SELECT   que.id,que.title,que.content,que.iid applicationCaseId,que.create_time createTime,que.uid,cus.nickname,cus.headerimg,cus.intro,app.title source  ,IF(answer.qid>0,answer.answerCount,0) answerCount
+    FROM   zl_questions  que
+	LEFT   JOIN   zl_customer  cus   ON  que.uid = cus.id
+	LEFT  JOIN   zl_application_case  app  ON   que.iid = app.id
+	LEFT  JOIN   (SELECT  COUNT(qid) answerCount,qid FROM zl_answer  WHERE examine = 1 GROUP  BY   qid )  answer  ON  que.id=answer.qid
+	WHERE  que.info_class=2  AND  que.examine=1 AND  cus.del=1 AND  app.del=1 AND  que.id=#{id}
+  </select>
 </mapper>

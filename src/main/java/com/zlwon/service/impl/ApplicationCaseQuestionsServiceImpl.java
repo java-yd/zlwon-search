@@ -27,9 +27,19 @@ public class ApplicationCaseQuestionsServiceImpl implements ApplicationCaseQuest
 	
 	/**
 	 * 添加案例提问到文档中
+	 * @param 提问id，如果为null，就是添加所有
 	 */
-	public void addApplicationCaseQuestionsDocument() {
-		List<ApplicationCaseQuestionsES> list = questionsMapper.selectAllApplicationCaseQuestions();
+	public void addApplicationCaseQuestionsDocument(Integer id) {
+		List<ApplicationCaseQuestionsES> list = null;
+		if(id == null){
+			list = questionsMapper.selectAllApplicationCaseQuestions();
+		}else{
+			list = new ArrayList<>();
+			ApplicationCaseQuestionsES  applicationCaseQuestionsES = questionsMapper.selectApplicationCaseQuestionsById(id);
+			if(applicationCaseQuestionsES != null){
+				list.add(applicationCaseQuestionsES);
+			}
+		}
 		if(list != null  &&  list.size() > 0){
 			ElasticsearchTemplateUtils.addDocuments(elasticsearchTemplate, getApplicationCaseQuestionsIndexQuerys(list));
 		}

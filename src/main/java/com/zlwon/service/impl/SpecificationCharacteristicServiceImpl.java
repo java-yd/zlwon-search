@@ -27,10 +27,21 @@ public class SpecificationCharacteristicServiceImpl implements SpecificationChar
 	
 	/**
 	 * 添加物性标签到文档中
+	 * @param id：物性标签id，如果为null，就是添加所有
 	 * @return
 	 */
-	public void addSpecificationCharacteristicDocument() {
-		List<SpecificationCharacteristicES> list = characteristicMapper.selectAllCharacteristic();
+	public void addSpecificationCharacteristicDocument(Integer  id) {
+		List<SpecificationCharacteristicES> list = null;
+		if(id == null){
+			list = characteristicMapper.selectAllCharacteristic();
+		}else{
+			list = new ArrayList<>();
+			SpecificationCharacteristicES specificationCharacteristicES = characteristicMapper.selectById(id);
+			if(specificationCharacteristicES != null){
+				list.add(specificationCharacteristicES);
+			}
+		}
+		
 		if(list != null  &&  list.size() > 0){
 			ElasticsearchTemplateUtils.addDocuments(elasticsearchTemplate, getSpecificationCharacteristicIndexQuerys(list));
 		}

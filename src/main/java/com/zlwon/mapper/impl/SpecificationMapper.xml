@@ -22,5 +22,15 @@
 	LEFT  JOIN   zl_customer  cus   ON   spe.mid = cus.id 
 	WHERE  spe.del=1  AND  cus.role = 2
   </select>
+  
+  
+  <!-- 根据物性id，得到物性信息 -->
+  <select id="selectSpecificationById" resultMap="BaseResultMap" >
+    SELECT  spe.id,spe.name,spe.mid,spe.tid,spe.msid,spe.fid_str,spe.scid_str,spe.create_time,spe.content,par01.name  brandName,par02.name baseMaterial,cus.company  manufacturer FROM   zl_specification  spe
+	LEFT  JOIN   zl_specification_parameter  par01  ON  spe.tid=par01.id AND   par01.class_type = 1
+	LEFT  JOIN   zl_specification_parameter  par02  ON  spe.msid=par02.id AND   par02.class_type = 2
+	LEFT  JOIN   zl_customer  cus   ON   spe.mid = cus.id 
+	WHERE  spe.del=1  AND  cus.role = 2 AND spe.id=#{id}
+  </select>
     
 </mapper>

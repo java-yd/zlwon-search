@@ -1,9 +1,25 @@
 package com.zlwon.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zlwon.pojo.constant.EsConstant;
+import com.zlwon.pojo.es.ApplicationCaseES;
+import com.zlwon.pojo.es.ApplicationCaseQuestionsAnswerES;
+import com.zlwon.pojo.es.ApplicationCaseQuestionsES;
+import com.zlwon.pojo.es.CustomerES;
+import com.zlwon.pojo.es.SpecificationCharacteristicES;
+import com.zlwon.pojo.es.SpecificationES;
+import com.zlwon.pojo.es.SpecificationQuestionsAnswerES;
+import com.zlwon.pojo.es.SpecificationQuestionsES;
+import com.zlwon.pojo.es.SpecificationQuotationES;
 import com.zlwon.service.AnswerService;
 import com.zlwon.service.ApplicationCaseQuestionsService;
 import com.zlwon.service.ApplicationCaseService;
@@ -12,6 +28,7 @@ import com.zlwon.service.SpecificationCharacteristicService;
 import com.zlwon.service.SpecificationQuestionsService;
 import com.zlwon.service.SpecificationQuotationService;
 import com.zlwon.service.SpecificationService;
+import com.zlwon.utils.es.ElasticsearchTemplateUtils;
 
 @RestController
 @RequestMapping("job")
@@ -33,6 +50,8 @@ public class JobController {
 	private  CustomerService  customerService;
 	@Autowired
 	private  AnswerService  answerService;
+	@Autowired
+	private  ElasticsearchTemplate   elasticsearchTemplate;
 
 	/**
 	 * 物性表添加到文档中
@@ -59,7 +78,7 @@ public class JobController {
 	 */
 	@RequestMapping("addApplicationCaseQuestionsDocument")
 	public   String    addApplicationCaseQuestionsDocument(){
-		applicationCaseQuestionsService.addApplicationCaseQuestionsDocument();
+		applicationCaseQuestionsService.addApplicationCaseQuestionsDocument(null);
 		return  "success";
 	}
 	
@@ -69,7 +88,7 @@ public class JobController {
 	 */
 	@RequestMapping("addSpecificationQuestionsDocument")
 	public   String    addSpecificationQuestionsDocument(){
-		specificationQuestionsService.addSpecificationQuestionsDocument();
+		specificationQuestionsService.addSpecificationQuestionsDocument(null);
 		return  "success";
 	}
 	
@@ -78,7 +97,7 @@ public class JobController {
 	 */
 	@RequestMapping("addSpecificationQuotationDocument")
 	public   String   addSpecificationQuotationDocument(){
-		specificationQuotationService.addSpecificationQuotationDocument();
+		specificationQuotationService.addSpecificationQuotationDocument(null);
 		return  "success";
 	}
 	
@@ -88,7 +107,7 @@ public class JobController {
 	 */
 	@RequestMapping("addSpecificationCharacteristicDocument")
 	public  String   addSpecificationCharacteristicDocument(){
-		specificationCharacteristicService.addSpecificationCharacteristicDocument();
+		specificationCharacteristicService.addSpecificationCharacteristicDocument(null);
 		return  "success";
 	}
 	
@@ -111,4 +130,6 @@ public class JobController {
 		answerService.addAnswerDocument();
 		return  "success";
 	}
+	
+	
 }

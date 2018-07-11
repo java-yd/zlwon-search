@@ -28,10 +28,21 @@ public class SpecificationQuestionsServiceImpl implements SpecificationQuestions
 	
 	/**
 	 * 添加物性提问到文档中
+	 * @param 提问id，如果为null，就是添加所有
 	 */
 	@Override
-	public void addSpecificationQuestionsDocument() {
-		List<SpecificationQuestionsES> list = questionsMapper.selectAllSpecificationQuestions();
+	public void addSpecificationQuestionsDocument(Integer id) {
+		List<SpecificationQuestionsES> list = null;
+		if(id == null){
+			list = questionsMapper.selectAllSpecificationQuestions();
+		}else{
+			list = new ArrayList<>();
+			SpecificationQuestionsES  specificationQuestionsES = questionsMapper.selectSpecificationQuestionsById(id);
+			if(specificationQuestionsES != null){
+				list.add(specificationQuestionsES);
+			}
+		}
+		
 		if(list != null  &&  list.size() > 0){
 			ElasticsearchTemplateUtils.addDocuments(elasticsearchTemplate, getSpecificationQuestionsIndexQuerys(list));
 		}

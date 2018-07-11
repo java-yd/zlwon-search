@@ -28,10 +28,20 @@ public class SpecificationQuotationServiceImpl implements SpecificationQuotation
 	
 	/**
 	 * 添加报价单到文档中
+	 * @param id:报价单id，null就是添加所有
 	 */
 	@Override
-	public void addSpecificationQuotationDocument() {
-		List<SpecificationQuotationES> list = dealerdQuotationMapper.selectAllDealerdQuotation();
+	public void addSpecificationQuotationDocument(Integer id) {
+		List<SpecificationQuotationES> list = null;
+		if(id == null){
+			list = dealerdQuotationMapper.selectAllDealerdQuotation();
+		}else{
+			list = new ArrayList<>();
+			SpecificationQuotationES specificationQuotationES = dealerdQuotationMapper.selectById(id);
+			if(specificationQuotationES != null){
+				list.add(specificationQuotationES);
+			}
+		}
 		if(list != null  &&  list.size() > 0){
 			ElasticsearchTemplateUtils.addDocuments(elasticsearchTemplate, getSpecificationQuotationIndexQuerys(list));
 		}

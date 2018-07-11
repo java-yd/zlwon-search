@@ -17,5 +17,12 @@ public interface CharacteristicMapper {
      * @return
      */
 	List<SpecificationCharacteristicES> selectAllCharacteristic();
+
+	/**
+	 * 根据标签id，得到标签信息
+	 * @param id
+	 * @return
+	 */
+	SpecificationCharacteristicES selectById(Integer id);
 	
 }

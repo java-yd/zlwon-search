@@ -22,4 +22,10 @@ public interface SpecificationService {
 	 * @return
 	 */
 	SpecificationES findOneSpecificationById(String   id);
+
+	/**
+	 * 添加(更新)物性信息
+	 * @param id 物性id
+	 */
+	void addOrUpdateSpecification(Integer id);
 }

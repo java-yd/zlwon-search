@@ -18,4 +18,11 @@ public interface ApplicationCaseMapper {
 	 */
 	List<ApplicationCaseES> selectAllApplicationCase();
 
+	/**
+	 * 根据案例id，得到案例信息
+	 * @param id
+	 * @return
+	 */
+	ApplicationCaseES selectApplicationCaseById(Integer id);
+
 }

@@ -14,4 +14,11 @@ public interface SpecificationMapper {
 
     List<SpecificationES> selectAllSpecification();
 
+    /**
+     * 根据物性id，得到物性信息
+     * @param id
+     * @return
+     */
+	SpecificationES selectSpecificationById(Integer id);
+
 }

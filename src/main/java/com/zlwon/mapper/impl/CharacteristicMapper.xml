@@ -7,5 +7,10 @@
     SELECT   id,spec_id specificationId,label_name labelName  FROM   zl_characteristic   WHERE   examine = 1
   </select>
   
+  <!-- 根据标签id，得到标签信息 -->
+  <select id="selectById" resultType="com.zlwon.pojo.es.SpecificationCharacteristicES">
+    SELECT   id,spec_id specificationId,label_name labelName  FROM   zl_characteristic   WHERE   examine = 1 AND id = #{id}
+  </select>
+  
   
 </mapper>

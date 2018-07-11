@@ -17,4 +17,10 @@ public interface ApplicationCaseService {
 	 * @return
 	 */
 	Object findApplicationCase(Integer pageIndex, Integer pageSize, ApplicationCaseDTO applicationCaseDTO);
+
+	/**
+	 * 添加或修改案例信息
+	 * @param id
+	 */
+	void addOrUpdateApplicationCase(Integer id);
 }
